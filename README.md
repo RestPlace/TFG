@@ -103,15 +103,15 @@ pip install monai[all]
 Esto instalará todas las dependencias adicionales que pueden ser útiles para varios tipos de tareas y configuraciones en MONAI.
 
 ## Scripts
-Este proyecto tiene las versiones convertidas a Python para poder ejecutarlas sin contar con las gráficas y las representaciones de imágenes.
+Este proyecto tiene las versiones convertidas a Python para poder ejecutarlas sin contar con las gráficas ni las representaciones de imágenes.
 
 ## Ejemplos de ejecución
 
 ```bash
-python MODELO_MONAI_BASICO.ipynb
-python MODELO_MONAI_PREENTRENADO.ipynb
-python MODELO_PYTORCH_FINAL.ipynb
-python MODELO_TENSORFLOW_FINAL.ipynb
+python MODELO_MONAI_BASICO.py
+python MODELO_MONAI_PREENTRENADO.py
+python MODELO_PYTORCH_FINAL.py
+python MODELO_TENSORFLOW_FINAL.py
 ```
 
 ## Licencia
