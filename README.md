@@ -17,8 +17,7 @@ Este proyecto incluye varios cuadernos y scripts de modelos de Deep Learning uti
 - [Instalación de Dependencias Opcionales](#instalación-de-dependencias-opcionales)
   - [Instalación de Dependencias Opcionales de MONAI](#instalación-de-dependencias-opcionales-de-monai)
 - [Scripts](#scripts)
-- [Ejemplos](#ejemplos)
-- [Contribuidores](#contribuidores)
+- [Ejemplos](#ejemplos-de-ejecución)
 - [Licencia](#licencia)
 
 ## Instalación
