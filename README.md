@@ -8,7 +8,6 @@ Este proyecto incluye varios cuadernos y scripts de modelos de Deep Learning uti
 - [Instalación](#instalación)
 - [Dependencias](#dependencias)
 - [Configuración](#configuración)
-- [Requerimientos](#requerimientos)
 - [Uso](#uso)
   - [Modelo MONAI](#modelo-monai)
   - [Modelo MONAI Preentrenado](#modelo-monai-preentrenado)
@@ -63,13 +62,6 @@ Para configurar las rutas de los datos de entrenamiento y prueba, modifique las 
 root_dir = "/ruta/a/tus/datos"
 metric_dir = "ruta/donde/estan/tus/metricas"
 ```
-
-## Requerimientos
-En el archivo de texto requirements.txt se pueden ver todas las dependencias principales usadas en el proyecto. Para instalarlas, simplemente ejecuta el siguiente comando:
-```bash
-pip install -r requirements.txt
-```
-
 
 ## Uso
 
