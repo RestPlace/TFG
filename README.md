@@ -16,7 +16,6 @@ Este proyecto incluye varios cuadernos y scripts de modelos de Deep Learning uti
 - [Recomendaciones](#recomendaciones)
 - [Instalación de Dependencias Opcionales](#instalación-de-dependencias-opcionales)
   - [Instalación de Dependencias Opcionales de MONAI](#instalación-de-dependencias-opcionales-de-monai)
-  - [Instalación de CUDA](#instalación-de-cuda)
 - [Scripts](#scripts)
 - [Ejemplos](#ejemplos)
 - [Contribuidores](#contribuidores)
@@ -102,9 +101,6 @@ Para instalar todas las dependencias opcionales de MONAI, ejecuta el siguiente c
 pip install monai[all]
 ```
 Esto instalará todas las dependencias adicionales que pueden ser útiles para varios tipos de tareas y configuraciones en MONAI.
-
-### Instalación de CUDA
-Para instalar CUDA, visita el [sitio oficial de NVIDIA](https://developer.nvidia.com/cuda-downloads) y sigue las instrucciones para tu sistema operativo y versión de hardware. Asegúrate de que tu GPU es compatible con la versión de CUDA que planeas instalar.
 
 ## Scripts
 Este proyecto tiene las versiones convertidas a Python para poder ejecutarlas sin contar con las gráficas y las representaciones de imágenes.
