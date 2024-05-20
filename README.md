@@ -1,173 +1,130 @@
-# TFG-
-Estudio e implementación de frameworks que soporten el uso de librerías de NVIDIA de una aplicación orientada a trabajar con imágenes sanitarias
 
+# Proyecto de Modelos de Deep Learning
 
-# Clasificación de Imágenes con Modelo de MONAI (DenseNet201 Preentrenado)
-
-Este proyecto está dedicado a la investigación y entrenamiento de un modelo básico de MONAI, usando DenseNet201 con pesos preentrenados.
+## Introducción
+Este proyecto incluye varios cuadernos y scripts de modelos de Deep Learning utilizando diferentes frameworks: MONAI, MONAI preentrenado, PyTorch y TensorFlow. Cada uno de estos cuadernos está diseñado para tareas específicas de procesamiento y análisis de imágenes médicas. Este README proporciona una guía completa para su instalación, configuración y uso.
 
 ## Tabla de Contenidos
-- [Introducción](#introducción)
 - [Instalación](#instalación)
-- [Uso](#uso)
-- [Características](#características)
 - [Dependencias](#dependencias)
 - [Configuración](#configuración)
-- [Documentación](#documentación)
+- [Requerimientos](#requerimientos)
+- [Uso](#uso)
+  - [Modelo MONAI](#modelo-monai)
+  - [Modelo MONAI Preentrenado](#modelo-monai-preentrenado)
+  - [Modelo PyTorch](#modelo-pytorch)
+  - [Modelo TensorFlow](#modelo-tensorflow)
+- [Recomendaciones](#recomendaciones)
+- [Instalación de Dependencias Opcionales](#instalación-de-dependencias-opcionales)
+  - [Instalación de Dependencias Opcionales de MONAI](#instalación-de-dependencias-opcionales-de-monai)
+  - [Instalación de CUDA](#instalación-de-cuda)
+- [Scripts](#scripts)
 - [Ejemplos](#ejemplos)
-- [Solución de Problemas](#solución-de-problemas)
 - [Contribuidores](#contribuidores)
 - [Licencia](#licencia)
 
-## Introducción
-Este cuaderno está dedicado a la investigación y entrenamiento de un modelo básico de MONAI, usando DenseNet201 con pesos preentrenados. Tanto el modelo como las transformaciones han cambiado respecto al resto de modelos. La única similitud se mantiene en la carga de datos y la representación de imágenes, que se basan en código de Python normal.
-
 ## Instalación
-Para instalar todas las dependencias necesarias, siga los pasos a continuación.
+Para instalar las dependencias y configurar el entorno para ejecutar los scripts, sigue los siguientes pasos:
 
-### Requisitos Previos
-- CUDA
-- Python 3.8+
-
-### Pasos de Instalación
-1. **Clonar el repositorio**:
+1. Clona este repositorio:
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
-    cd <NOMBRE_DEL_REPOSITORIO>
+    git clone https://github.com/RestPlace/TFG
+    cd TFG
     ```
 
-2. **Crear y activar un entorno virtual**:
+2. Crea un entorno virtual:
     ```bash
     python -m venv env
-    source env/bin/activate  # En Windows, use `env\Scriptsctivate`
+    source env/bin/activate  # En Windows usa `env\Scripts\activate`
     ```
 
-3. **Instalar las dependencias**:
+3. Instala las dependencias:
     ```bash
     pip install -r requirements.txt
     ```
 
-### Dependencias Principales
-A continuación se listan las principales bibliotecas y sus versiones necesarias para este proyecto:
-
-- `monai==1.3.1rc2`
-- `numpy==1.26.4`
-- `torch==2.2.2+cu121`
-- `torchvision==0.17.2+cu121`
-- `scikit-image==0.22.0`
-- `scipy==1.11.4`
-- `pandas==2.1.4`
-- `tqdm==4.65.0`
-- `pillow==10.2.0`
-- `tensorboard==2.16.2`
-- `pynrrd==1.0.0`
-- `clearml==1.15.1`
-- `gdown==4.7.3`
-- `lmdb==1.4.1`
-- `psutil==5.9.0`
-- `einops==0.7.0`
-- `mlflow==2.11.3`
-
-Para instalar las dependencias opcionales, visite: [Documentación de MONAI](https://docs.monai.io/en/latest/installation.html#installing-the-recommended-dependencies).
-
-## Uso
-Para entrenar y evaluar el modelo, puede utilizar las celdas proporcionadas en el notebook `MODELO_MONAI_PREENTRENADO.ipynb`. Asegúrese de configurar las rutas correctas a los datos de entrenamiento y prueba.
-
-### Ejecución del Notebook
-1. Abra el notebook:
-    ```bash
-    jupyter notebook MODELO_MONAI_PREENTRENADO.ipynb
-    ```
-
-2. Ejecute las celdas en orden para realizar el entrenamiento y la evaluación del modelo.
-
-## Características
-- Modelo DenseNet201 preentrenado.
-- Transformaciones personalizadas para el preprocesamiento de datos.
-- Integración con CUDA para aceleración con GPU.
-
 ## Dependencias
-A continuación se listan todas las dependencias utilizadas en este proyecto:
-```python
-# Librerías de Python
-import os
-import tifffile
-import tempfile
-import re
-import matplotlib.pyplot as plt
-import PIL
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
-from collections import Counter
-from tqdm import tqdm
-from torch.hub import load_state_dict_from_url
-from torch.utils.data import Dataset, DataLoader
-from torch.utils.tensorboard import SummaryWriter
-import numpy as np
-from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.model_selection import train_test_split
-from typing import Sequence
-# Librerías de MONAI
-from monai.apps import download_and_extract
-from monai.config import print_config
-from monai.data import decollate_batch, DataLoader, PILReader
-from monai.metrics import ROCAUCMetric
-from monai.utils.module import look_up_option
-from monai.networks.nets import DenseNet
-from monai.optimizers import Novograd
-from monai.optimizers.lr_scheduler import WarmupCosineSchedule
-from monai.transforms import (
-    Activations,
-    EnsureChannelFirst,
-    AsDiscrete,
-    Compose,
-    LoadImage,
-    ScaleIntensity,
-    RandRotate,
-    RandFlip,
-    RandZoom,
-    RandGaussianNoise,
-    RandShiftIntensity,
-    NormalizeIntensity,
-    ToTensor
-)
-from monai.utils import set_determinism
-```
+Las principales dependencias para este proyecto incluyen:
+- Python 3.8 o superior
+- MONAI
+- PyTorch
+- TensorFlow
+- CUDA (recomendado para aceleración GPU)
+
+Asegúrate de que tu sistema tenga los controladores de CUDA adecuados instalados. Puedes verificar la compatibilidad y descargar CUDA desde el [sitio oficial de NVIDIA](https://developer.nvidia.com/cuda-downloads).
+
+### Instalación de Python
+Para instalar Python, visita el [sitio oficial de Python](https://www.python.org/downloads/) y descarga la versión 3.8 o superior para tu sistema operativo. Sigue las instrucciones de instalación proporcionadas.
 
 ## Configuración
-Para configurar las rutas de los datos de entrenamiento y prueba, modifique las siguientes variables en el notebook:
-```python
+Para configurar las rutas de los datos de entrenamiento y prueba, modifique las siguientes variables en el cuaderno correspondiente:
+
+```bash
 root_dir = "/ruta/a/tus/datos"
-data_dir_train = os.path.join(root_dir, "entrenamiento")
-data_dir_test = os.path.join(root_dir, "test")
+metric_dir = "ruta/donde/estan/tus/metricas"
 ```
 
-## Documentación
-La documentación detallada del proyecto se encuentra en el notebook `MODELO_MONAI_PREENTRENADO.ipynb`.
-
-## Ejemplos
-A continuación se muestra un ejemplo de cómo se configura y ejecuta el entrenamiento del modelo:
-```python
-# Configuración de los datos
-root_dir = "/home/jose/TFG/Data/Celulas"
-data_dir_train = os.path.join(root_dir, "entrenamiento")
-data_dir_test = os.path.join(root_dir, "test")
-
-# Verifica si el directorio de datos existe
-if not os.path.exists(data_dir_train):
-    raise FileNotFoundError(f"El directorio de datos de entrenamiento {data_dir_train} no existe.")
-if not os.path.exists(data_dir_test):
-    raise FileNotFoundError(f"El directorio de datos de prueba {data_dir_test} no existe.")
-print(data_dir_train)
-print(data_dir_test)
+## Requerimientos
+En el archivo de texto requirements.txt se pueden ver todas las dependencias principales usadas en el proyecto. Para instalarlas, simplemente ejecuta el siguiente comando:
+```bash
+pip install -r requirements.txt
 ```
 
-## Solución de Problemas
-Si encuentra algún problema, verifique que todas las dependencias estén correctamente instaladas y que las rutas a los datos sean correctas. Puede consultar la documentación de MONAI para más detalles sobre la instalación y configuración.
 
-## Contribuidores
-- [Tu Nombre](https://github.com/tu_usuario)
+## Uso
 
+### Modelo MONAI
+Tanto el cuaderno `MODELO_MONAI_BASICO.ipynb` como `MODELO_MONAI_PREENTRENADO.ipynb`   implementan un modelo básico y uno preentrenado respectivamente, pero comparten las mismas dependencias. Asegúrate de tener las siguientes dependencias instaladas:
+```bash
+pip install monai
+pip install torch
+pip install torchvision
+pip install torchaudio
+pip install numpy
+```
+
+### Modelo PyTorch
+El cuaderno `MODELO_PYTORCH_FINAL.ipynb` está implementado en PyTorch puro. Asegúrate de tener PyTorch y las bibliotecas necesarias instaladas:
+```bash
+pip install torch
+pip install torchvision
+pip install torchaudio
+pip install numpy
+```
+
+### Modelo TensorFlow
+El cuaderno `MODELO_TENSORFLOW_FINAL.ipynb` utiliza TensorFlow para la implementación del modelo. Instala TensorFlow y las bibliotecas necesarias:
+```bash
+pip install tensorflow
+pip install numpy
+```
+
+## Recomendaciones
+Es altamente recomendable instalar CUDA para acelerar el procesamiento en GPU, especialmente para modelos grandes y complejos. La instalación de CUDA puede mejorar significativamente el rendimiento de entrenamiento e inferencia.
+
+## Instalación de Dependencias Opcionales
+
+### Instalación de Dependencias Opcionales de MONAI
+Para instalar todas las dependencias opcionales de MONAI, ejecuta el siguiente comando:
+```bash
+pip install monai[all]
+```
+Esto instalará todas las dependencias adicionales que pueden ser útiles para varios tipos de tareas y configuraciones en MONAI.
+
+### Instalación de CUDA
+Para instalar CUDA, visita el [sitio oficial de NVIDIA](https://developer.nvidia.com/cuda-downloads) y sigue las instrucciones para tu sistema operativo y versión de hardware. Asegúrate de que tu GPU es compatible con la versión de CUDA que planeas instalar.
+
+## Scripts
+Este proyecto tiene las versiones convertidas a Python para poder ejecutarlas sin contar con las gráficas y las representaciones de imágenes.
+
+## Ejemplos de ejecución
+
+```bash
+python MODELO_MONAI_BASICO.ipynb
+python MODELO_MONAI_PREENTRENADO.ipynb
+python MODELO_PYTORCH_FINAL.ipynb
+python MODELO_TENSORFLOW_FINAL.ipynb
+```
+
+## Licencia
+Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
