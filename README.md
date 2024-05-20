@@ -86,6 +86,7 @@ pip install numpy
 El cuaderno `MODELO_TENSORFLOW_FINAL.ipynb` utiliza TensorFlow para la implementación del modelo. Instala TensorFlow y las bibliotecas necesarias:
 ```bash
 pip install tensorflow
+pip install tensorflow-io
 pip install numpy
 ```
 
