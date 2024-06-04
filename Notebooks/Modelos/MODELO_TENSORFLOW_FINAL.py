@@ -10,7 +10,7 @@
 
 # ## Imports
 
-# In[30]:
+# In[1]:
 
 
 import os
@@ -40,7 +40,7 @@ from typing import Sequence
 # 
 # Recoge las células de entrenamiento y de test de cada una de 
 
-# In[31]:
+# In[2]:
 
 
 root_dir = "/home/jose/TFG/Data/Celulas"
@@ -48,7 +48,7 @@ root_dir = "/home/jose/TFG/Data/Celulas"
 # Directorio que contiene tus datos locales
 data_dir_train = os.path.join(root_dir, "entrenamiento")
 data_dir_test = os.path.join(root_dir, "test")
-# Verifica si el directorio de datos existe
+
 if not os.path.exists(data_dir_train):
     raise FileNotFoundError(f"El directorio de datos de entrenamiento {data_dir_train} no existe.")
 if not os.path.exists(data_dir_test):
@@ -59,7 +59,7 @@ print(data_dir_test)
 
 # ## Semilla determinista
 
-# In[32]:
+# In[3]:
 
 
 tf.random.set_seed(7)
@@ -68,7 +68,7 @@ tf.random.set_seed(7)
 # ## Cargar los Datafolders
 # 
 
-# In[33]:
+# In[4]:
 
 
 # Obtener los nombres de las clases de entrenamiento
@@ -83,7 +83,7 @@ for i, class_name_train in enumerate(class_names_train):
     class_dir_train = os.path.join(data_dir_train, class_name_train)
     image_files_train = [os.path.join(class_dir_train, x) for x in os.listdir(class_dir_train) if x.endswith('.tiff') and not x.startswith('.')]  # Filtrar archivos TIFF y ocultos
     image_files_list_train.extend(image_files_train)
-    image_class_train.extend([class_name_train] * len(image_files_train))  # Guardar el nombre de la clase en lugar del índice
+    image_class_train.extend([class_name_train] * len(image_files_train))  
 
 # Crear un DataFrame con las rutas de las imágenes y las etiquetas de clase
 df_train = pd.DataFrame({
@@ -127,7 +127,7 @@ plt.show()
 
 # ## Celulas de prueba
 
-# In[34]:
+# In[5]:
 
 
 # Obtener nombres de las clases
@@ -196,13 +196,11 @@ plt.show()
 
 # ## IMÁGENES DE ENTRENAMIENTO
 
-# In[35]:
+# In[6]:
 
 
 # Crear subgráficos
 fig, axs = plt.subplots(3, 3, figsize=(12, 12))
-
-# Seleccionar aleatoriamente 9 imágenes sin reemplazo
 random_indices = np.random.choice(num_total_train, size=9, replace=False)
 
 # Mostrar las imágenes y etiquetas
@@ -211,11 +209,9 @@ for i, idx in enumerate(random_indices):
     image_path = image_files_list_train[idx]
     image = PIL.Image.open(image_path)
     ax.imshow(image, cmap="gray", vmin=0, vmax=255)
-    class_name = image_class_train[idx]  # Obtener el nombre de la clase directamente
+    class_name = image_class_train[idx]
     ax.set_title(f"Clase: {class_name}\nÍndice: {idx}")
     ax.axis("off")
-
-# Ajustar diseño y mostrar
 plt.tight_layout()
 plt.show()
 
@@ -236,13 +232,11 @@ plt.show()
 
 # ## IMAGENES DE PRUEBA
 
-# In[36]:
+# In[7]:
 
 
 # Crear subgráficos
 fig, axs = plt.subplots(3, 3, figsize=(12, 12))
-
-# Seleccionar aleatoriamente 9 imágenes sin reemplazo
 random_indices = np.random.choice(num_total_test, size=9, replace=False)
 
 # Mostrar las imágenes y etiquetas
@@ -251,19 +245,18 @@ for i, idx in enumerate(random_indices):
     image_path = image_files_list_test[idx]
     image = PIL.Image.open(image_path)
     ax.imshow(image, cmap="gray", vmin=0, vmax=255)
-    class_name = image_class_test[idx]  # Obtener el nombre de la clase directamente
+    class_name = image_class_test[idx]
     ax.set_title(f"Clase: {class_name}\nÍndice: {idx}")
     ax.axis("off")
-
-# Ajustar diseño y mostrar
 plt.tight_layout()
 plt.show()
 
 # Crear un DataFrame para la distribución de clases
 class_distribution_test = pd.DataFrame({
-    'class_name': class_names_test,
-    'count': [image_class_test.count(class_name) for class_name in class_names_test]
+    'class_name': image_class_test
 })
+class_distribution_test = class_distribution_test['class_name'].value_counts().reset_index()
+class_distribution_test.columns = ['class_name', 'count']
 
 # Mostrar gráfico de barras de la distribución de clases
 plt.figure(figsize=(10, 6))
@@ -280,10 +273,13 @@ plt.show()
 # 
 # Se elige de manera aleatoria un 10% de los datos de entrenamiento para la validación.
 
-# In[37]:
+# In[8]:
 
 
+#Aquí puedes especificar el porcentaje de validación
 val_frac = 0.1
+
+
 length_train = len(image_files_list_train)
 length_test = len(image_files_list_test)
 indices_train = np.arange(length_train)
@@ -308,43 +304,42 @@ print(f"Training count: {len(train_x)}, Validation count: " f"{len(val_x)}, Test
 
 # ## Definición de las Transformaciones y Balanceo de Clases
 
-# In[85]:
+# In[9]:
 
 
 # Crear un diccionario para mapear las etiquetas a enteros
 label_to_int = {label: idx for idx, label in enumerate(class_names_train)}
 
-# Definir transformaciones en TensorFlow
+# Transformaciones e TensorFlow
 def random_transform(image):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.rot90(image, k=random.randint(0, 3))  # Rotación aleatoria
     return image
 
+#Preprocesamiento de una imagen
 def preprocess_image(image):
-    # Convertir a float y normalizar si es necesario
     image = tf.image.convert_image_dtype(image, tf.float32)
     return image
 
-# Función para cargar y preprocesar imágenes TIFF usando tensorflow-io
+# Función para cargar y preprocesar imágenes TIFF
 def load_and_preprocess_image(path):
     image = tf.io.read_file(path)
-    image = tfio.experimental.image.decode_tiff(image)  # Decodificar la imagen TIFF
-    image = tf.image.resize(image, [256, 256])  # Redimensionar si es necesario
-    if image.shape[-1] == 4:  # Si tiene 4 canales, convertir a 3 canales
-        image = image[..., :3]
-    image = image / 255.0  # Normalizar la imagen
+    image = tfio.experimental.image.decode_tiff(image)  
+    image = tf.image.resize(image, [256, 256])  # Redimensionar según el tipo de imagen que elijas
+    image = image[..., :3]
+    image = image / 255.0  
     return image
 
 def load_and_preprocess_image_tensor(path):
     image = tf.numpy_function(load_and_preprocess_image, [path], tf.float32)
-    image.set_shape((256, 256, 3))  # Asegurarse de que todas las imágenes tienen 3 canales
+    image.set_shape((256, 256, 3))  
     return image
 
 # Número de imágenes aleatorias que deseas generar por cada imagen original
 num_random_images = 40
 
-# Definir una nueva clase de conjunto de datos que aplica transformaciones aleatorias a cada imagen
+# Clase de Dataset con transformaciones aleatorias
 class RandomTransformDataset(tf.data.Dataset):
     def _generator(image_files, labels, num_random_images):
         for i in range(len(image_files)):
@@ -353,10 +348,8 @@ class RandomTransformDataset(tf.data.Dataset):
             original_image = load_and_preprocess_image_tensor(filename)
             original_image = preprocess_image(original_image)
 
-            # Yield la imagen original y la etiqueta
             yield original_image.numpy(), label_to_int[label.decode('utf-8')]
 
-            # Yield imágenes transformadas aleatoriamente
             for _ in range(num_random_images):
                 random_image = random_transform(original_image)
                 yield random_image.numpy(), label_to_int[label.decode('utf-8')]
@@ -374,7 +367,7 @@ class RandomTransformDataset(tf.data.Dataset):
 
 # ## Cargar datos de Entrenamiento, Validación y Prueba
 
-# In[86]:
+# In[18]:
 
 
 # Crear los datasets usando la clase RandomTransformDataset
@@ -397,7 +390,7 @@ print(f"Total de imágenes de prueba: {len(test_x)}")
 
 # ### Importación de funciones auxiliares de métricas
 
-# In[87]:
+# In[19]:
 
 
 # Función para calcular métricas de evaluación
@@ -423,6 +416,7 @@ def compute_metric(predictions, targets):
         "specificity": specificity
     }
 
+#Definición de la métrica compuesta
 def compute_composite_metric(metrics):
     accuracy = metrics["accuracy"]
     precision = metrics["precision"]
@@ -434,13 +428,13 @@ def compute_composite_metric(metrics):
 
 # ### Definición del Modelo
 
-# In[88]:
+# In[20]:
 
 
+#MODELO HECHO A MANO
 class ModeloTensorFlow(tf.keras.Model):
     def __init__(self, num_classes):
         super(ModeloTensorFlow, self).__init__()
-        # Capas convolucionales con batch normalization
         self.conv1 = layers.Conv2D(64, kernel_size=3, padding='same', activation=None)
         self.bn1 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(128, kernel_size=3, padding='same', activation=None)
@@ -454,13 +448,11 @@ class ModeloTensorFlow(tf.keras.Model):
         
         self.pool = layers.MaxPooling2D(pool_size=(2, 2))
         
-        # Calcular el tamaño de entrada para las capas completamente conectadas
         self.flatten = layers.Flatten()
         self.fc1 = layers.Dense(1024, activation='relu')
         self.fc2 = layers.Dense(512, activation='relu')
         self.fc3 = layers.Dense(num_classes, activation='softmax')
         
-        # Dropout para regularización
         self.dropout = layers.Dropout(0.5)
 
     def call(self, x, training=False):
@@ -478,10 +470,13 @@ class ModeloTensorFlow(tf.keras.Model):
         x = self.fc3(x)
         return x
 
+    def build(self, input_shape):
+        super(ModeloTensorFlow, self).build(input_shape)
+
 
 # ### Configuración del Entrenamiento
 
-# In[89]:
+# In[21]:
 
 
 # Configuración del dispositivo
@@ -502,6 +497,7 @@ scheduler = tf.keras.optimizers.schedules.ExponentialDecay(
     staircase=True
 )
 model.compile(optimizer=optimizer, loss=loss_function, metrics=['accuracy'])
+
 # Parámetros de entrenamiento
 val_interval = 1
 max_epochs = 10
@@ -515,7 +511,7 @@ early_stopping_counter = 0
 
 # ### Ciclo de Entrenamiento
 
-# In[90]:
+# In[22]:
 
 
 # Determinar el directorio de las métricas
@@ -595,7 +591,7 @@ print(f"Entrenamiento completado, mejor métrica compuesta: {best_metric:.4f} en
 
 # ### Visualización de Resultados
 
-# In[82]:
+# In[23]:
 
 
 # Visualización de resultados
@@ -609,7 +605,7 @@ plt.xlabel("Época")
 plt.ylabel("Pérdida")
 plt.grid(True)
 plt.legend()
-
+print(epoch_loss_values)
 # Gráfico de la métrica compuesta por época
 plt.subplot(2, 3, 2)
 plt.plot(range(1, len(metric_values) + 1), metric_values, marker='o', linestyle='-', color='g', label='Métrica Compuesta')
@@ -618,7 +614,7 @@ plt.xlabel("Época")
 plt.ylabel("Métrica Compuesta")
 plt.grid(True)
 plt.legend()
-
+print(metric_values)
 # Gráfico de la precisión por época
 plt.subplot(2, 3, 3)
 plt.plot(range(1, len(precision_values) + 1), precision_values, marker='o', linestyle='-', color='r', label='Precisión')
@@ -627,7 +623,8 @@ plt.xlabel("Época")
 plt.ylabel("Precisión")
 plt.grid(True)
 plt.legend()
-
+print(precision_values)
+     
 # Gráfico del recall por época
 plt.subplot(2, 3, 4)
 plt.plot(range(1, len(recall_values) + 1), recall_values, marker='o', linestyle='-', color='m', label='Recall')
@@ -636,6 +633,7 @@ plt.xlabel("Época")
 plt.ylabel("Recall")
 plt.grid(True)
 plt.legend()
+print(recall_values)
 
 # Gráfico de la especificidad por época
 plt.subplot(2, 3, 5)
@@ -645,14 +643,14 @@ plt.xlabel("Época")
 plt.ylabel("Especificidad")
 plt.grid(True)
 plt.legend()
-
+print(specificity_values)
 plt.tight_layout(pad=3.0)
 plt.show()
 
 
 # ## Evaluar el modelo con los datos de prueba
 
-# In[84]:
+# In[24]:
 
 
 # Cargar el mejor modelo
@@ -667,11 +665,8 @@ print(f"Total number of samples in the test dataset: {test_dataset_size}")
 
 # Evaluar el modelo en el conjunto de prueba
 for test_images, test_labels in test_ds:
-    # Realizar predicciones
     outputs = model(test_images, training=False)
     pred = tf.argmax(outputs, axis=1, output_type=tf.int32)
-    
-    # Almacenar etiquetas verdaderas y predichas
     y_true.extend(test_labels.numpy())
     y_pred.extend(pred.numpy().astype(int))
 
